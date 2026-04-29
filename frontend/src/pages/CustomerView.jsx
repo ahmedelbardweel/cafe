@@ -40,8 +40,16 @@ export default function CustomerView() {
   const [table, setTable] = useState(null);
   const [tableStatus, setTableStatus] = useState('available');
   const [installPrompt, setInstallPrompt] = useState(null);
+  const [showIOSInvite, setShowIOSInvite] = useState(false);
 
   useEffect(() => {
+    // Detect iOS
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+    if (isIOS && !isStandalone) {
+      setShowIOSInvite(true);
+    }
+
     const handler = (e) => {
       e.preventDefault();
       setInstallPrompt(e);
@@ -265,6 +273,21 @@ export default function CustomerView() {
           </div>
         </div>
       </div>
+
+      {showIOSInvite && (
+        <div className="container mt-4">
+          <div className="card-glass p-4" style={{ border: '1px solid var(--color-primary)', background: 'var(--color-primary-light)', color: 'var(--color-primary)' }}>
+            <div className="flex items-start gap-3">
+              <span className="material-icons-round">ios_share</span>
+              <div style={{ flex: 1 }}>
+                <div className="font-black text-sm">تثبيت على الآيفون</div>
+                <div className="text-xs opacity-90 mt-1">اضغط على زر <strong>المشاركة</strong> في المتصفح ثم اختر <strong>"إضافة إلى الشاشة الرئيسية"</strong> لتثبيت التطبيق.</div>
+              </div>
+              <button className="btn btn-sm btn-ghost" onClick={() => setShowIOSInvite(false)} style={{ minWidth: 0, padding: 4 }}><span className="material-icons-round" style={{ fontSize: 18 }}>close</span></button>
+            </div>
+          </div>
+        </div>
+      )}
       <div className="container page">
         {/* The Menu Content stays the same, just removing the Bill Card from top */}
         <div className="category-tabs mb-4" style={{ padding: '4px 0' }}>
