@@ -2,7 +2,7 @@ services:
   # 1. Laravel Backend Service
   - type: web
     name: cafe-api
-    env: php
+    runtime: php
     buildCommand: |
       composer install --no-dev
       php artisan migrate --force
@@ -15,7 +15,8 @@ services:
         value: false
       - key: DB_CONNECTION
         value: pgsql
-      # These will be filled by you in Render Dashboard from Aiven details
+      - key: DB_SSLMODE
+        value: require
       - key: DB_HOST
         sync: false
       - key: DB_PORT
@@ -30,7 +31,7 @@ services:
   # 2. React Frontend Service
   - type: web
     name: cafe-frontend
-    env: static
+    runtime: static
     buildCommand: |
       cd frontend
       npm install
