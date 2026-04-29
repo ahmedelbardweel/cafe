@@ -1,0 +1,44 @@
+services:
+  # 1. Laravel Backend Service
+  - type: web
+    name: cafe-api
+    env: php
+    buildCommand: |
+      composer install --no-dev
+      php artisan migrate --force
+      php artisan db:seed --class=CafeSeeder --force
+    startCommand: php artisan serve --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: APP_KEY
+        generateValue: true
+      - key: APP_DEBUG
+        value: false
+      - key: DB_CONNECTION
+        value: pgsql
+      # These will be filled by you in Render Dashboard from Aiven details
+      - key: DB_HOST
+        sync: false
+      - key: DB_PORT
+        sync: false
+      - key: DB_DATABASE
+        sync: false
+      - key: DB_USERNAME
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+
+  # 2. React Frontend Service
+  - type: web
+    name: cafe-frontend
+    env: static
+    buildCommand: |
+      cd frontend
+      npm install
+      npm run build
+    staticPublishPath: frontend/dist
+    envVars:
+      - key: VITE_API_BASE_URL
+        fromService:
+          name: cafe-api
+          type: web
+          property: host
