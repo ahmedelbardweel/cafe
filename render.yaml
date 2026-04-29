@@ -1,13 +1,8 @@
 services:
-  # 1. Laravel Backend Service
+  # 1. Laravel Backend Service (Docker)
   - type: web
     name: cafe-api
-    runtime: php
-    buildCommand: |
-      composer install --no-dev
-      php artisan migrate --force
-      php artisan db:seed --class=CafeSeeder --force
-    startCommand: php artisan serve --host 0.0.0.0 --port $PORT
+    runtime: docker
     envVars:
       - key: APP_KEY
         generateValue: true
