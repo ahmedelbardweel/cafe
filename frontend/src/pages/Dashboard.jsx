@@ -30,7 +30,9 @@ function TableDetailsModal({ table, onClose, onToggleItem, onRelease, onMove, al
   };
 
   const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${window.location.origin}/table/${table.uuid}`;
-  const availableTables = allTables.filter(t => t.status === 'available' &  return (
+  const availableTables = allTables.filter(t => t.status === 'available' && t.id !== table.id);
+
+  return (
     <div className="bottom-sheet-overlay" style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'center', padding: 0, zIndex: 1000 }} onClick={(e) => e.target === e.currentTarget && onClose()}>
       <div className="bottom-sheet" style={{ maxWidth: 800, width: '100%', borderRadius: '24px 24px 0 0', overflow: 'hidden', boxShadow: '0 -20px 40px rgba(0,0,0,0.2)', background: '#fff', display: 'flex', flexDirection: 'column', maxHeight: '90vh' }}>
         
