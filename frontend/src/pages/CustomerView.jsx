@@ -169,7 +169,11 @@ export default function CustomerView() {
       setCart([]);
       setCartOpen(false);
     } catch (e) {
-      alert('عذراً، حدث خطأ أثناء إرسال الطلب. حاول مجدداً.');
+      if (e.code === 'ECONNABORTED' || e.message?.includes('timeout')) {
+        alert('الاتصال بطيء جداً. تم إرسال الطلب ربما - تحقق من قائمة طلباتك أو حاول مجدداً.');
+      } else {
+        alert('حدث خطأ أثناء إرسال الطلب. تحقق من اتصالك وحاول مجدداً.');
+      }
     }
     setSubmitting(false);
   };
@@ -181,13 +185,18 @@ export default function CustomerView() {
     form.append('receipt_image', receiptFile);
     try {
       await api.post(`/tables/${uuid}/checkout`, form, {
-        headers: { 'Content-Type': 'multipart/form-data' }
+        headers: { 'Content-Type': 'multipart/form-data' },
+        timeout: 30000, // 30s for image upload on slow internet
       });
       setLocked(true);
       setCheckout(false);
       pollStatus();
     } catch (e) {
-      alert('حدث خطأ أثناء رفع الوصل.');
+      if (e.code === 'ECONNABORTED' || e.message?.includes('timeout')) {
+        alert('الاتصال بطيء. قد يكون الوصل رُفع بالفعل - يرجى الانتظار أو المحاولة مجدداً.');
+      } else {
+        alert('حدث خطأ أثناء رفع الوصل. تحقق من اتصالك وحاول مجدداً.');
+      }
     }
     setSubmitting(false);
   };

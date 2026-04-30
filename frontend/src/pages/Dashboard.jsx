@@ -328,26 +328,48 @@ export default function Dashboard() {
   const [selectedTable, setSelectedTable] = useState(null);
   const [selectedPayment, setSelectedPayment] = useState(null);
   const navigate = useNavigate();
-  const audioRef = useRef(new Audio('https://assets.mixkit.co/active_storage/sfx/1004/1004-preview.mp3'));
+  const errorCountRef = useRef(0);
+
+  // Generate a beep sound locally - no internet needed
+  const playBeep = () => {
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const oscillator = ctx.createOscillator();
+      const gainNode = ctx.createGain();
+      oscillator.connect(gainNode);
+      gainNode.connect(ctx.destination);
+      oscillator.type = 'sine';
+      oscillator.frequency.setValueAtTime(880, ctx.currentTime);
+      gainNode.gain.setValueAtTime(0.3, ctx.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
+      oscillator.start(ctx.currentTime);
+      oscillator.stop(ctx.currentTime + 0.5);
+    } catch (e) { /* silent fail */ }
+  };
 
   const fetchTables = useCallback(async () => {
     try {
       const res = await api.get('/dashboard/tables');
       const newTables = res.data.tables;
+      errorCountRef.current = 0; // reset error count on success
 
       const hasNewPending = newTables.some(t => t.status === 'pending_payment' && !tables.find(old => old.id === t.id && old.status === 'pending_payment'));
       
-      // Check for ANY new order items or increased quantities across all tables
       const currentTotalQty = tables.reduce((acc, t) => acc + (t.current_session?.items?.reduce((sum, item) => sum + item.quantity, 0) || 0), 0);
       const newTotalQty = newTables.reduce((acc, t) => acc + (t.current_session?.items?.reduce((sum, item) => sum + item.quantity, 0) || 0), 0);
       
       if (hasNewPending || newTotalQty > currentTotalQty) {
-        audioRef.current.play().catch(() => { });
+        playBeep();
       }
 
       setTables(newTables);
     } catch (err) {
-      if (err.response?.status === 401) navigate('/admin/login');
+      errorCountRef.current += 1;
+      // Only redirect to login on actual 401, not on network/timeout errors
+      if (err.response?.status === 401) {
+        navigate('/admin/login');
+      }
+      // Ignore network errors silently - will retry next interval
     }
     setLoading(false);
   }, [tables, navigate]);
