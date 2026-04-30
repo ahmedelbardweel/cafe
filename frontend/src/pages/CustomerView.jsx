@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
-import api from '../api';
+import api, { API_BASE_URL } from '../api';
 
 // عنصر السلة
 function CartItem({ item, onIncrease, onDecrease }) {
@@ -307,7 +307,7 @@ export default function CustomerView() {
             <div key={item.id} className="menu-item-card" onClick={() => addToCart(item)}>
               <div className="menu-item-img">
                 {item.image ? (
-                  <img src={`http://${window.location.hostname}:8000/storage/${item.image}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt={item.name} />
+                  <img src={`${API_BASE_URL}/storage/${item.image}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt={item.name} />
                 ) : (
                   <div className="flex items-center justify-center h-full" style={{ background: '#f8fafc', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     <span className="material-icons-round" style={{ fontSize: 32, color: '#e2e8f0' }}>restaurant</span>

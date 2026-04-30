@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import api from '../api';
+import api, { API_BASE_URL } from '../api';
 
 function CategoryForm({ onSaved, editItem, onCancel }) {
   const [name, setName] = useState(editItem?.name || '');
@@ -181,7 +181,7 @@ export default function MenuManagement() {
                   catItems.map((item, i) => (
                     <div key={item.id} style={{ padding: '12px 20px', borderBottom: i < catItems.length - 1 ? '1px solid var(--color-border-light)' : 'none', display: 'flex', alignItems: 'center', gap: 12 }}>
                       {item.image && (
-                        <img src={`http://${window.location.hostname}:8000/storage/${item.image}`} style={{ width: 40, height: 40, objectFit: 'cover' }} alt="" />
+                        <img src={`${API_BASE_URL}/storage/${item.image}`} style={{ width: 40, height: 40, objectFit: 'cover' }} alt="" />
                       )}
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div className="font-bold text-sm">{item.name}</div>

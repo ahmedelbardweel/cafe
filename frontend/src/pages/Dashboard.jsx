@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import api from '../api';
+import api, { API_BASE_URL } from '../api';
 import MenuManagement from '../components/MenuManagement';
 
 const STATUS_LABEL = {
@@ -245,7 +245,7 @@ function PaymentModal({ payment, onApprove, onReject, onClose, approving, reject
         {/* Receipt Image Container */}
         <div style={{ background: '#0f172a', height: 420, overflowY: 'auto', display: 'flex', justifyContent: 'center', padding: '30px' }}>
           <img
-            src={`http://${window.location.hostname}:8000/storage/${payment.receipt_image_path}`}
+            src={`${API_BASE_URL}/storage/${payment.receipt_image_path}`}
             alt="Receipt"
             style={{ maxWidth: '100%', height: 'auto', borderRadius: 0, boxShadow: '0 20px 40px rgba(0,0,0,0.5)' }}
           />
