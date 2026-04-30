@@ -32,13 +32,34 @@ function TableDetailsModal({ table, onClose, onToggleItem, onRelease, onMove, al
     );
   };
 
-  // معالجة التجهيز للمجموعة المختارة
+  // معالجة التجهيز للمجموعة المختارة (Optimistic Update)
   const handleMarkPrepared = async () => {
-    setIsProcessing(true);
-    for (const itemId of selectedItems) {
-      await onToggleItem(itemId);
-    }
+    const originalItems = [...orderItems];
+    const itemIds = [...selectedItems];
+    
+    // Update UI instantly
+    const updatedTable = {
+      ...table,
+      current_session: {
+        ...table.current_session,
+        items: table.current_session.items.map(item => 
+          itemIds.includes(item.id) ? { ...item, is_prepared: true } : item
+        )
+      }
+    };
+    
+    // We don't setTables directly here as it's a child component, 
+    // but we can clear selection and show success
     setSelectedItems([]);
+    setIsProcessing(true);
+
+    try {
+      for (const itemId of itemIds) {
+        await onToggleItem(itemId);
+      }
+    } catch (e) {
+      alert('فشل التحديث، يرجى المحاولة مجدداً');
+    }
     setIsProcessing(false);
   };
 
@@ -378,13 +399,21 @@ export default function Dashboard() {
 
   const approvePayment = async (id) => {
     if (approving || rejecting) return;
+    const prevTables = [...tables];
+    
+    // Optimistic: Update table status locally
+    setTables(current => current.map(t => 
+      (t.current_session?.payment?.id === id) ? { ...t, status: 'available', current_session: null } : t
+    ));
+    setSelectedPayment(null);
+
     setApproving(true);
     try {
       await api.post(`/dashboard/payments/${id}/approve`);
-      await fetchTables();
-      setSelectedPayment(null);
+      // Sync eventually via polling
     } catch (e) {
-      alert(e.response?.data?.message || 'فشل تأكيد الدفع');
+      setTables(prevTables);
+      alert(e.response?.data?.message || 'فشل تأكيد الدفع، يرجى المحاولة مجدداً');
     } finally {
       setApproving(false);
     }
@@ -405,12 +434,16 @@ export default function Dashboard() {
   };
 
   const releaseTable = async (id) => {
+    const prevTables = [...tables];
+    // Optimistic
+    setTables(current => current.map(t => t.id === id ? { ...t, status: 'available', current_session: null } : t));
+    setSelectedTable(null);
+
     try {
       await api.post(`/dashboard/tables/${id}/release`);
-      fetchTables();
-      setSelectedTable(null);
     } catch (e) {
-      alert('فشل إغلاق الطاولة');
+      setTables(prevTables);
+      alert('فشل إغلاق الطاولة، يرجى التحقق من الاتصال');
     }
   };
 
@@ -425,11 +458,24 @@ export default function Dashboard() {
   };
 
   const toggleItemPrepared = async (itemId) => {
+    // Optimistic Update: Update local state immediately
+    const prevTables = [...tables];
+    setTables(current => current.map(table => ({
+      ...table,
+      current_session: table.current_session ? {
+        ...table.current_session,
+        items: table.current_session.items.map(item => 
+          item.id === itemId ? { ...item, is_prepared: !item.is_prepared } : item
+        )
+      } : null
+    })));
+
     try {
       await api.post(`/dashboard/items/${itemId}/toggle-prepared`);
-      fetchTables();
+      // No need to fetchTables immediately, interval will sync eventually
     } catch (e) {
-      alert('فشل تحديث حالة الصنف');
+      setTables(prevTables); // Rollback on error
+      alert('فشل تحديث حالة الصنف، يرجى التحقق من الاتصال.');
     }
   };
 

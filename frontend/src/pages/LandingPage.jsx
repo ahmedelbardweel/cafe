@@ -1,4 +1,6 @@
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import api from '../api';
 
 const fadeIn = (delay = 0) => ({
   animation: `fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) ${delay}s both`,
@@ -6,6 +8,11 @@ const fadeIn = (delay = 0) => ({
 
 export default function LandingPage() {
   const navigate = useNavigate();
+
+  // Wake up backend immediately on landing page load
+  useEffect(() => {
+    api.get('/dashboard/tables').catch(() => {});
+  }, []);
 
   return (
     <div style={{ minHeight: '100vh', overflowX: 'hidden', fontFamily: 'Cairo, sans-serif', direction: 'rtl' }}>
