@@ -1,93 +1,94 @@
 import { useNavigate } from 'react-router-dom';
 
+const fadeIn = (delay = 0) => ({
+  animation: `fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) ${delay}s both`,
+});
+
 export default function LandingPage() {
   const navigate = useNavigate();
 
   return (
-    <div className="landing-page" style={{ minHeight: '100vh', overflowX: 'hidden' }}>
-      
+    <div style={{ minHeight: '100vh', overflowX: 'hidden', fontFamily: 'Cairo, sans-serif', direction: 'rtl' }}>
+
       {/* Navbar */}
-      <nav className="navbar" style={{ background: 'rgba(255, 255, 255, 0.9)', backdropFilter: 'blur(10px)', border: 'none', boxShadow: '0 4px 30px rgba(0, 0, 0, 0.05)' }}>
-        <div className="container navbar-inner" style={{ alignItems: 'center' }}>
-          <div className="navbar-brand" style={{ gap: '12px' }}>
-            <span className="material-icons-round" style={{ background: 'var(--color-primary)', color: '#fff', padding: '8px', borderRadius: '12px', fontSize: '24px', boxShadow: '0 8px 16px rgba(59, 130, 246, 0.3)' }}>coffee</span>
-            <span style={{ fontSize: '1.4rem', fontWeight: 900, letterSpacing: '-0.5px' }}>كافيه ريف</span>
+      <nav className="navbar" style={{ background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(12px)', borderBottom: '1px solid #e2e8f0', boxShadow: '0 4px 20px rgba(0,0,0,0.04)' }}>
+        <div className="container navbar-inner">
+          <div className="navbar-brand" style={{ gap: 10 }}>
+            <span className="material-icons-round" style={{ background: 'var(--color-primary)', color: '#fff', padding: 8, borderRadius: 12, fontSize: 22 }}>coffee</span>
+            <span style={{ fontSize: '1.3rem', fontWeight: 900 }}>كافيه ريف</span>
           </div>
-          <button className="btn btn-ghost" onClick={() => navigate('/admin/login')} style={{ borderRadius: '50px', padding: '8px 24px', fontWeight: 800, border: '2px solid var(--color-primary)', color: 'var(--color-primary)' }}>
+          <button
+            onClick={() => navigate('/admin/login')}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '8px 20px', borderRadius: 50, fontWeight: 800, fontSize: '0.9rem', border: '2px solid var(--color-primary)', color: 'var(--color-primary)', background: 'transparent', cursor: 'pointer', fontFamily: 'Cairo, sans-serif' }}
+          >
+            <span className="material-icons-round" style={{ fontSize: 18 }}>manage_accounts</span>
             دخول الإدارة
           </button>
         </div>
       </nav>
 
       {/* Hero Section */}
-      <section className="hero-section" style={{ padding: '80px 0', position: 'relative', overflow: 'hidden' }}>
-        <div className="hero-bg-shapes">
-          <div className="shape shape-1"></div>
-          <div className="shape shape-2"></div>
-        </div>
-        
-        <div className="container" style={{ position: 'relative', zIndex: 10 }}>
-          <div className="hero-content" style={{ maxWidth: '800px', margin: '0 auto', textAlign: 'center' }}>
-            <div className="badge-pill animate-fade-in-up" style={{ margin: '0 auto 24px', background: 'var(--color-primary-light)', color: 'var(--color-primary)', padding: '8px 16px', borderRadius: '50px', width: 'auto', display: 'inline-flex', fontSize: '0.9rem', gap: '8px' }}>
-              <span className="material-icons-round" style={{ fontSize: '18px' }}>celebration</span>
-              نظام إدارة المقاهي الذكي
-            </div>
-            
-            <h1 className="hero-title animate-fade-in-up" style={{ fontSize: 'clamp(2.5rem, 5vw, 4.5rem)', fontWeight: 900, lineHeight: 1.2, marginBottom: '24px', color: 'var(--color-text)', letterSpacing: '-1px', animationDelay: '0.1s' }}>
-              مستقبل الضيافة يبدأ <span style={{ color: 'var(--color-primary)', position: 'relative' }}>من هنا<svg style={{ position: 'absolute', bottom: '-10px', left: 0, width: '100%', height: '12px' }} viewBox="0 0 100 10" preserveAspectRatio="none"><path d="M0 5 Q 50 15 100 5" stroke="var(--color-warning)" strokeWidth="4" fill="transparent"/></svg></span>
-            </h1>
-            
-            <p className="hero-subtitle animate-fade-in-up" style={{ fontSize: '1.2rem', color: 'var(--color-text-secondary)', marginBottom: '40px', lineHeight: 1.8, maxWidth: '600px', margin: '0 auto 40px', animationDelay: '0.2s' }}>
-              تجربة فريدة للزبائن وسهولة مطلقة في الإدارة. امسح رمز الطاولة، اطلب قهوتك، وادفع بكل سهولة دون انتظار.
-            </p>
+      <section style={{ background: 'linear-gradient(135deg, #f0f9ff 0%, #e0e7ff 50%, #f0fdf4 100%)', padding: '100px 0 80px', position: 'relative', overflow: 'hidden' }}>
+        {/* Background blobs */}
+        <div style={{ position: 'absolute', top: -100, right: -100, width: 400, height: 400, background: 'rgba(59,130,246,0.12)', borderRadius: '50%', filter: 'blur(80px)' }} />
+        <div style={{ position: 'absolute', bottom: -80, left: -80, width: 350, height: 350, background: 'rgba(16,185,129,0.1)', borderRadius: '50%', filter: 'blur(80px)' }} />
 
-            <div className="hero-actions animate-fade-in-up" style={{ display: 'flex', gap: '16px', justifyContent: 'center', animationDelay: '0.3s' }}>
-              <div className="glass-card" style={{ padding: '24px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px', background: 'rgba(255, 255, 255, 0.8)' }}>
-                <span className="material-icons-round text-primary" style={{ fontSize: '48px', animation: 'float 3s ease-in-out infinite' }}>qr_code_scanner</span>
-                <div>
-                  <h3 style={{ fontSize: '1.2rem', fontWeight: 900 }}>أنت زبون؟</h3>
-                  <p style={{ color: 'var(--color-text-secondary)', fontSize: '0.9rem', marginTop: '4px' }}>قم بمسح الـ QR الموجود على طاولتك لتبدأ</p>
-                </div>
-              </div>
+        <div className="container" style={{ position: 'relative', zIndex: 5, textAlign: 'center' }}>
+
+          {/* Badge */}
+          <div style={{ ...fadeIn(0), display: 'inline-flex', alignItems: 'center', gap: 8, background: 'var(--color-primary-light)', color: 'var(--color-primary)', padding: '8px 20px', borderRadius: 50, fontSize: '0.85rem', fontWeight: 800, marginBottom: 32 }}>
+            <span className="material-icons-round" style={{ fontSize: 18 }}>auto_awesome</span>
+            نظام إدارة المقاهي الذكي
+          </div>
+
+          {/* Title */}
+          <h1 style={{ ...fadeIn(0.1), fontSize: 'clamp(2.2rem, 5vw, 4rem)', fontWeight: 900, lineHeight: 1.2, color: '#0f172a', marginBottom: 20 }}>
+            مستقبل الضيافة يبدأ{' '}
+            <span style={{ color: 'var(--color-primary)' }}>من هنا ☕</span>
+          </h1>
+
+          {/* Subtitle */}
+          <p style={{ ...fadeIn(0.2), fontSize: '1.1rem', color: '#64748b', maxWidth: 560, margin: '0 auto 48px', lineHeight: 1.9 }}>
+            تجربة فريدة للزبائن وسهولة مطلقة في الإدارة. امسح رمز الطاولة، اطلب قهوتك، وادفع بكل سهولة دون انتظار.
+          </p>
+
+          {/* QR Card */}
+          <div style={{ ...fadeIn(0.3), display: 'inline-flex', flexDirection: 'column', alignItems: 'center', gap: 16, background: 'rgba(255,255,255,0.85)', backdropFilter: 'blur(16px)', border: '1px solid rgba(255,255,255,0.7)', borderRadius: 24, padding: '32px 48px', boxShadow: '0 20px 60px rgba(0,0,0,0.08)' }}>
+            <span className="material-icons-round" style={{ fontSize: 64, color: 'var(--color-primary)', animation: 'float 3s ease-in-out infinite' }}>qr_code_scanner</span>
+            <div>
+              <h3 style={{ fontSize: '1.2rem', fontWeight: 900, color: '#0f172a', marginBottom: 4 }}>أنت زبون؟</h3>
+              <p style={{ color: '#64748b', fontSize: '0.9rem' }}>امسح الـ QR على طاولتك لتبدأ الطلب فوراً</p>
             </div>
           </div>
         </div>
       </section>
 
       {/* Features Section */}
-      <section style={{ padding: '80px 0', background: 'var(--color-bg)' }}>
+      <section style={{ padding: '80px 0', background: '#ffffff' }}>
         <div className="container">
-          <div style={{ textAlign: 'center', marginBottom: '60px' }}>
-            <h2 style={{ fontSize: '2.5rem', fontWeight: 900, marginBottom: '16px' }}>لماذا كافيه ريف؟</h2>
-            <p style={{ color: 'var(--color-text-secondary)', fontSize: '1.1rem' }}>نظام متكامل صُمم خصيصاً لراحتك</p>
+          <div style={{ textAlign: 'center', marginBottom: 56 }}>
+            <h2 style={{ fontSize: '2rem', fontWeight: 900, color: '#0f172a', marginBottom: 12 }}>لماذا كافيه ريف؟</h2>
+            <p style={{ color: '#64748b', fontSize: '1rem' }}>نظام متكامل صُمم خصيصاً لراحتك</p>
           </div>
 
-          <div className="grid cols-3 gap-4 feature-grid">
-            
-            <div className="feature-card glass-card animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
-              <div className="feature-icon" style={{ background: 'var(--color-primary-light)', color: 'var(--color-primary)' }}>
-                <span className="material-icons-round">restaurant_menu</span>
-              </div>
-              <h3 style={{ fontSize: '1.4rem', fontWeight: 800, margin: '16px 0 8px' }}>منيو رقمي ذكي</h3>
-              <p style={{ color: 'var(--color-text-secondary)', lineHeight: 1.6 }}>استعرض القائمة بالصور، أضف طلباتك للسلة، وأرسلها للمطبخ بضغطة زر.</p>
-            </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 24 }}>
 
-            <div className="feature-card glass-card animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
-              <div className="feature-icon" style={{ background: 'rgba(16, 185, 129, 0.1)', color: 'var(--color-success)' }}>
-                <span className="material-icons-round">payments</span>
+            {[
+              { icon: 'restaurant_menu', color: 'var(--color-primary)', bg: 'var(--color-primary-light)', title: 'منيو رقمي ذكي', desc: 'استعرض القائمة بالصور، أضف طلباتك للسلة، وأرسلها للمطبخ بضغطة زر.' },
+              { icon: 'payments', color: 'var(--color-success)', bg: 'rgba(16,185,129,0.1)', title: 'دفع إلكتروني آمن', desc: 'ارفع وصل الدفع البنكي مباشرة من هاتفك وسيتم تأكيده فوراً من الإدارة.' },
+              { icon: 'speed', color: 'var(--color-warning)', bg: 'rgba(245,158,11,0.1)', title: 'متابعة حية', desc: 'تابع حالة طلبك أولاً بأول من لحظة الإرسال وحتى التقديم على طاولتك.' },
+            ].map((f, i) => (
+              <div key={i} style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: 20, padding: 32, boxShadow: '0 4px 20px rgba(0,0,0,0.04)', transition: 'all 0.3s ease', ...fadeIn(0.1 * (i + 1)) }}
+                onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-8px)'; e.currentTarget.style.boxShadow = '0 20px 40px rgba(0,0,0,0.1)'; }}
+                onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 4px 20px rgba(0,0,0,0.04)'; }}
+              >
+                <div style={{ width: 60, height: 60, background: f.bg, color: f.color, borderRadius: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 20 }}>
+                  <span className="material-icons-round" style={{ fontSize: 30 }}>{f.icon}</span>
+                </div>
+                <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#0f172a', marginBottom: 10 }}>{f.title}</h3>
+                <p style={{ color: '#64748b', lineHeight: 1.7, fontSize: '0.95rem' }}>{f.desc}</p>
               </div>
-              <h3 style={{ fontSize: '1.4rem', fontWeight: 800, margin: '16px 0 8px' }}>دفع إلكتروني آمن</h3>
-              <p style={{ color: 'var(--color-text-secondary)', lineHeight: 1.6 }}>ارفع وصل الدفع البنكي مباشرة من هاتفك وسيتم تأكيده فوراً من الإدارة.</p>
-            </div>
-
-            <div className="feature-card glass-card animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
-              <div className="feature-icon" style={{ background: 'rgba(245, 158, 11, 0.1)', color: 'var(--color-warning)' }}>
-                <span className="material-icons-round">speed</span>
-              </div>
-              <h3 style={{ fontSize: '1.4rem', fontWeight: 800, margin: '16px 0 8px' }}>متابعة حية</h3>
-              <p style={{ color: 'var(--color-text-secondary)', lineHeight: 1.6 }}>تابع حالة طلبك أولاً بأول من لحظة الإرسال وحتى التقديم على طاولتك.</p>
-            </div>
-
+            ))}
           </div>
         </div>
       </section>
@@ -95,14 +96,14 @@ export default function LandingPage() {
       {/* Footer */}
       <footer style={{ background: '#0f172a', color: 'white', padding: '60px 0 40px', borderTop: '4px solid var(--color-primary)' }}>
         <div className="container" style={{ textAlign: 'center' }}>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '12px', marginBottom: '24px' }}>
-            <span className="material-icons-round" style={{ color: 'var(--color-primary)', fontSize: '32px' }}>coffee</span>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
+            <span className="material-icons-round" style={{ color: 'var(--color-primary)', fontSize: 32 }}>coffee</span>
             <span style={{ fontSize: '1.8rem', fontWeight: 900 }}>كافيه ريف</span>
           </div>
-          <p style={{ color: '#94a3b8', maxWidth: '400px', margin: '0 auto 32px', lineHeight: 1.6 }}>
+          <p style={{ color: '#94a3b8', maxWidth: 400, margin: '0 auto 32px', lineHeight: 1.7 }}>
             النظام الأحدث والأذكى لإدارة المقاهي وتجربة الزبائن.
           </p>
-          <div style={{ padding: '24px 0 0', borderTop: '1px solid rgba(255,255,255,0.1)', color: '#64748b', fontSize: '0.9rem' }}>
+          <div style={{ paddingTop: 24, borderTop: '1px solid rgba(255,255,255,0.1)', color: '#64748b', fontSize: '0.85rem' }}>
             © {new Date().getFullYear()} كافيه ريف. جميع الحقوق محفوظة.
           </div>
         </div>
