@@ -440,3 +440,102 @@ body {
   border-radius: 4px;
   z-index: 5;
 }
+
+/* --- LANDING PAGE STYLES --- */
+.glass-card {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.05);
+  border-radius: 24px;
+}
+
+.hero-section {
+  background: linear-gradient(135deg, var(--color-bg-alt) 0%, #e0e7ff 100%);
+}
+
+.hero-bg-shapes {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.shape {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.5;
+}
+
+.shape-1 {
+  width: 400px;
+  height: 400px;
+  background: var(--color-primary-light);
+  top: -100px;
+  right: -100px;
+  animation: float 8s ease-in-out infinite alternate;
+}
+
+.shape-2 {
+  width: 300px;
+  height: 300px;
+  background: rgba(16, 185, 129, 0.2);
+  bottom: -50px;
+  left: -50px;
+  animation: float 10s ease-in-out infinite alternate-reverse;
+}
+
+.feature-grid {
+  grid-template-columns: 1fr;
+}
+@media (min-width: 768px) {
+  .feature-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.feature-card {
+  padding: 32px;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.feature-card:hover {
+  transform: translateY(-10px) scale(1.02);
+  box-shadow: 0 30px 60px rgba(0,0,0,0.08);
+  border-color: rgba(59, 130, 246, 0.3);
+}
+
+.feature-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+}
+.feature-icon .material-icons-round {
+  font-size: 32px;
+}
+
+/* Animations */
+@keyframes float {
+  0% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-20px) rotate(5deg); }
+  100% { transform: translateY(0px) rotate(0deg); }
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(40px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in-up {
+  opacity: 0;
+  animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}

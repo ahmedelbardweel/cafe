@@ -6,6 +6,7 @@ import './index.css';
 import CustomerView from './pages/CustomerView';
 import AdminLogin from './pages/AdminLogin';
 import Dashboard from './pages/Dashboard';
+import LandingPage from './pages/LandingPage';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
@@ -14,13 +15,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         <Route path="/table/:uuid" element={<CustomerView />} />
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/admin" element={<Dashboard />} />
-        <Route path="/" element={
-          <div className="flex items-center justify-center" style={{ height: '100vh', flexDirection: 'column', gap: 16 }}>
-            <div style={{ fontSize: 48 }}>☕</div>
-            <h1 className="text-2xl font-bold">Cafe System</h1>
-            <p className="text-secondary">Scan your table QR to start ordering</p>
-          </div>
-        } />
+        <Route path="/" element={<LandingPage />} />
       </Routes>
     </BrowserRouter>
   </React.StrictMode>

@@ -30,33 +30,31 @@ function TableDetailsModal({ table, onClose, onToggleItem, onRelease, onMove, al
   };
 
   const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${window.location.origin}/table/${table.uuid}`;
-  const availableTables = allTables.filter(t => t.status === 'available' && t.id !== table.id);
-
-  return (
-    <div className="modal-overlay" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px', zIndex: 1000 }} onClick={(e) => e.target === e.currentTarget && onClose()}>
-      <div className="modal" style={{ maxWidth: 650, width: '100%', borderRadius: 0, overflow: 'hidden', boxShadow: '0 30px 60px -12px rgba(0,0,0,0.3)', background: '#fff' }}>
+  const availableTables = allTables.filter(t => t.status === 'available' &  return (
+    <div className="bottom-sheet-overlay" style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'center', padding: 0, zIndex: 1000 }} onClick={(e) => e.target === e.currentTarget && onClose()}>
+      <div className="bottom-sheet" style={{ maxWidth: 800, width: '100%', borderRadius: '24px 24px 0 0', overflow: 'hidden', boxShadow: '0 -20px 40px rgba(0,0,0,0.2)', background: '#fff', display: 'flex', flexDirection: 'column', maxHeight: '90vh' }}>
         
         {/* Header */}
-        <div className="modal-header" style={{ padding: '20px 25px', borderBottom: '1px solid #f1f5f9', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div className="modal-header" style={{ padding: '24px 30px', borderBottom: '1px solid #f1f5f9', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#fff' }}>
           <div className="flex items-center gap-4">
-            <div style={{ width: 44, height: 44, background: 'var(--color-primary-light)', borderRadius: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <span className="material-icons-round text-primary" style={{ fontSize: 24 }}>restaurant</span>
+            <div style={{ width: 48, height: 48, background: 'var(--color-primary-light)', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <span className="material-icons-round text-primary" style={{ fontSize: 28 }}>restaurant</span>
             </div>
             <div>
-              <h3 className="font-black text-xl leading-none">طاولة {table.table_number}</h3>
-              <div className="text-xs text-secondary mt-1">جلسة نشطة • {orderItems.length} أصناف</div>
+              <h3 className="font-black text-2xl leading-none">طاولة {table.table_number}</h3>
+              <div className="text-sm text-secondary mt-2 font-bold">جلسة نشطة • {orderItems.length} أصناف</div>
             </div>
           </div>
-          <button className="btn btn-ghost btn-sm" onClick={onClose}><span className="material-icons-round">close</span></button>
+          <button className="btn btn-ghost" style={{ width: 40, height: 40, padding: 0, borderRadius: '50%' }} onClick={onClose}><span className="material-icons-round">close</span></button>
         </div>
 
         {/* Move Session Section */}
         {moving && (
-          <div style={{ background: '#f8fafc', padding: '20px', borderBottom: '1px solid #e2e8f0' }}>
+          <div style={{ background: '#f8fafc', padding: '20px 30px', borderBottom: '1px solid #e2e8f0' }}>
             <div className="flex items-center gap-3">
               <select 
                 className="form-control" 
-                style={{ flex: 1, borderRadius: 0, height: 46, fontWeight: 'bold' }}
+                style={{ flex: 1, borderRadius: '8px', height: 46, fontWeight: 'bold', fontSize: '1rem', padding: '0 16px', border: '1px solid #cbd5e1' }}
                 value={targetTableId}
                 onChange={(e) => setTargetTableId(e.target.value)}
               >
@@ -67,99 +65,115 @@ function TableDetailsModal({ table, onClose, onToggleItem, onRelease, onMove, al
               </select>
               <button 
                 className="btn btn-primary" 
-                style={{ borderRadius: 0, height: 46 }}
+                style={{ borderRadius: '8px', height: 46, padding: '0 24px', fontSize: '1rem' }}
                 disabled={!targetTableId}
                 onClick={() => onMove(table.id, targetTableId)}
               >تأكيد النقل</button>
-              <button className="btn btn-ghost" onClick={() => setMoving(false)}>إلغاء</button>
+              <button className="btn btn-ghost" style={{ borderRadius: '8px', height: 46 }} onClick={() => setMoving(false)}>إلغاء</button>
             </div>
           </div>
         )}
 
-        <div className="modal-body" style={{ maxHeight: '65vh', overflowY: 'auto', padding: 0 }}>
+        <div className="modal-body" style={{ overflowY: 'auto', padding: 0, flex: 1, background: '#f8fafc' }}>
           {/* QR & Info Area */}
-          <div style={{ padding: '24px', textAlign: 'center', borderBottom: '1px dashed #e2e8f0', background: '#fff' }}>
-            <div style={{ background: '#fff', padding: 10, border: '1px solid #e2e8f0', display: 'inline-block', marginBottom: 10 }}>
-              <img src={qrUrl} alt="Table QR" style={{ width: 80, height: 80 }} />
+          <div style={{ padding: '30px', textAlign: 'center', borderBottom: '1px solid #e2e8f0', background: '#fff', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <div style={{ background: '#fff', padding: 16, border: '2px solid #e2e8f0', borderRadius: '16px', display: 'inline-block', marginBottom: 16, boxShadow: '0 10px 25px rgba(0,0,0,0.05)' }}>
+              <img src={qrUrl} alt="Table QR" style={{ width: 180, height: 180, display: 'block' }} />
             </div>
-            <div className="text-xs font-black text-primary uppercase tracking-tighter">نظام إدارة الطلبات الذكي</div>
+            <div className="text-sm font-black text-primary uppercase tracking-tighter mb-4">امسح الرمز لطلب الطعام</div>
+            <a href={qrUrl} download={`table-${table.table_number}-qr.png`} target="_blank" rel="noreferrer" className="btn btn-ghost btn-sm" style={{ borderRadius: '50px', border: '2px solid var(--color-primary)', color: 'var(--color-primary)', fontWeight: 800, padding: '8px 24px' }}>
+              <span className="material-icons-round">download</span>
+              تحميل الـ QR
+            </a>
           </div>
 
-          <div style={{ padding: '25px' }}>
-            <div className="flex justify-between items-center mb-5">
-              <h4 className="font-black text-sm flex items-center gap-2 text-slate-700">
-                <span className="material-icons-round text-primary">format_list_bulleted</span>
+          <div style={{ padding: '30px' }}>
+            <div className="flex justify-between items-center mb-6">
+              <h4 className="font-black text-lg flex items-center gap-2 text-slate-800">
+                <span className="material-icons-round text-primary" style={{ fontSize: 24 }}>format_list_bulleted</span>
                 محتويات الطلب
               </h4>
-              <div className="badge" style={{ background: 'var(--color-primary)', color: '#fff', fontSize: '11px', padding: '4px 10px' }}>
+              <div className="badge" style={{ background: 'var(--color-primary)', color: '#fff', fontSize: '13px', padding: '6px 14px', borderRadius: '50px' }}>
                 {orderItems.filter(i => i.is_prepared).length} من {orderItems.length} جاهز
               </div>
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               {orderItems.length > 0 ? (
                 orderItems.map((item) => (
-                  <div key={item.id} className={`order-item-row ${item.is_prepared ? 'is-done' : ''} ${toggling === item.id ? 'is-loading' : ''}`} onClick={() => handleToggle(item.id)}>
+                  <label key={item.id} className={`order-item-row ${item.is_prepared ? 'is-done' : ''} ${toggling === item.id ? 'is-loading' : ''}`} style={{ cursor: 'pointer', borderRadius: '12px' }}>
                     <div className="flex items-center gap-4 flex-1">
-                      <div className="qty-badge">{item.quantity}</div>
+                      <div className="qty-badge" style={{ borderRadius: '8px', width: 44, height: 44, fontSize: '18px' }}>{item.quantity}</div>
                       <div>
-                        <div className="item-name">{item.menu_item?.name || 'صنف غير معروف'}</div>
-                        <div className="item-price-sub">₪{item.menu_item?.price || 0} للواحد</div>
+                        <div className="item-name" style={{ fontSize: '1.2rem' }}>{item.menu_item?.name || 'صنف غير معروف'}</div>
+                        <div className="item-price-sub" style={{ fontSize: '1rem', marginTop: 4 }}>₪{item.menu_item?.price || 0} للواحد</div>
                       </div>
                     </div>
                     
                     <div className="flex items-center gap-6">
                       <div className="text-left">
-                        <div className="item-total-price">₪{(item.quantity * (item.menu_item?.price || 0)).toFixed(2)}</div>
+                        <div className="item-total-price" style={{ fontSize: '1.4rem' }}>₪{(item.quantity * (item.menu_item?.price || 0)).toFixed(2)}</div>
                       </div>
-                      <div className="status-toggle">
+                      <div className="custom-checkbox" style={{ position: 'relative', width: 32, height: 32 }}>
                         {toggling === item.id ? (
-                          <div className="spinner" style={{ width: 18, height: 18, borderTopColor: 'var(--color-primary)' }}></div>
+                          <div className="spinner" style={{ width: 24, height: 24, borderTopColor: 'var(--color-primary)', margin: 4 }}></div>
                         ) : (
-                          <span className={`material-icons-round ${item.is_prepared ? 'text-success' : 'text-slate-200'}`} style={{ fontSize: 28 }}>
-                            {item.is_prepared ? 'check_circle' : 'radio_button_unchecked'}
-                          </span>
+                          <>
+                            <input 
+                              type="checkbox" 
+                              checked={!!item.is_prepared} 
+                              onChange={() => handleToggle(item.id)}
+                              style={{ opacity: 0, position: 'absolute', width: '100%', height: '100%', cursor: 'pointer', zIndex: 2 }}
+                            />
+                            <div style={{ 
+                              width: '100%', height: '100%', border: `2px solid ${item.is_prepared ? 'var(--color-success)' : '#cbd5e1'}`, 
+                              borderRadius: '8px', background: item.is_prepared ? 'var(--color-success)' : '#fff',
+                              display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s'
+                            }}>
+                              {item.is_prepared && <span className="material-icons-round" style={{ color: '#fff', fontSize: 20 }}>check</span>}
+                            </div>
+                          </>
                         )}
                       </div>
                     </div>
-                  </div>
+                  </label>
                 ))
               ) : (
-                <div className="text-center py-12">
-                  <span className="material-icons-round text-slate-200" style={{ fontSize: 48 }}>inventory_2</span>
-                  <p className="text-sm font-bold text-secondary mt-2">لا توجد طلبات نشطة</p>
+                <div className="text-center py-12" style={{ background: '#fff', borderRadius: '16px', border: '1px dashed #cbd5e1' }}>
+                  <span className="material-icons-round text-slate-200" style={{ fontSize: 64 }}>inventory_2</span>
+                  <p className="text-lg font-bold text-secondary mt-4">لا توجد طلبات نشطة</p>
                 </div>
               )}
             </div>
 
             {/* Total Footer */}
             {orderItems.length > 0 && (
-              <div className="total-box-kitchen">
+              <div className="total-box-kitchen" style={{ borderRadius: '16px' }}>
                 <div className="flex justify-between items-center">
-                  <span className="text-sm font-bold opacity-80 text-white">المجموع الإجمالي المطلوب</span>
-                  <span className="text-3xl font-black text-white">₪{totalPrice.toFixed(2)}</span>
+                  <span className="text-lg font-bold opacity-90 text-white">المجموع الإجمالي المطلوب</span>
+                  <span className="text-4xl font-black text-white">₪{totalPrice.toFixed(2)}</span>
                 </div>
               </div>
             )}
           </div>
         </div>
 
-        <div className="p-4 bg-white flex gap-3" style={{ borderTop: '1px solid #e2e8f0' }}>
-          <button className="btn btn-ghost flex-1 kitchen-btn" style={{ color: '#ef4444', border: '1px solid #fee2e2' }} onClick={() => {
+        <div className="bg-white flex gap-3" style={{ borderTop: '1px solid #e2e8f0', padding: '20px 30px' }}>
+          <button className="btn btn-ghost flex-1 kitchen-btn" style={{ color: '#ef4444', border: '2px solid #fee2e2', borderRadius: '12px', background: '#fef2f2' }} onClick={() => {
             if (window.confirm('هل أنت متأكد من رغبتك في إغلاق هذه الطاولة وتصفير الجلسة؟')) onRelease(table.id);
           }}>
-            <span className="material-icons-round">no_meals</span>
+            <span className="material-icons-round" style={{ fontSize: 24 }}>no_meals</span>
             إغلاق الطاولة
           </button>
           
-          <button className="btn btn-ghost flex-1 kitchen-btn" onClick={() => setMoving(true)} disabled={moving}>
-            <span className="material-icons-round">swap_horiz</span>
+          <button className="btn btn-ghost flex-1 kitchen-btn" style={{ border: '2px solid #e2e8f0', borderRadius: '12px' }} onClick={() => setMoving(true)} disabled={moving}>
+            <span className="material-icons-round" style={{ fontSize: 24 }}>swap_horiz</span>
             نقل الطاولة
           </button>
 
-          <button className="btn btn-primary flex-1 kitchen-btn" onClick={() => window.print()}>
-            <span className="material-icons-round">print</span>
-            طباعة
+          <button className="btn btn-primary flex-1 kitchen-btn" style={{ borderRadius: '12px', fontSize: '1.1rem' }} onClick={() => window.print()}>
+            <span className="material-icons-round" style={{ fontSize: 24 }}>print</span>
+            طباعة الفاتورة
           </button>
         </div>
       </div>
