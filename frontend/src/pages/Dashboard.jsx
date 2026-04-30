@@ -19,164 +19,143 @@ function TableDetailsModal({ table, onClose, onToggleItem, onRelease, onMove, al
   if (!table) return null;
   const orderItems = table.current_session?.items || [];
   const totalPrice = orderItems.reduce((sum, item) => sum + (item.quantity * (item.menu_item?.price || 0)), 0);
-  const [toggling, setToggling] = useState(null);
+  
+  const [selectedItems, setSelectedItems] = useState([]); 
   const [moving, setMoving] = useState(false);
   const [targetTableId, setTargetTableId] = useState('');
+  const [isProcessing, setIsProcessing] = useState(false);
 
-  const handleToggle = async (itemId) => {
-    setToggling(itemId);
-    await onToggleItem(itemId);
-    setToggling(null);
+  // تبديل اختيار العنصر
+  const toggleSelection = (itemId) => {
+    setSelectedItems(prev => 
+      prev.includes(itemId) ? prev.filter(id => id !== itemId) : [...prev, itemId]
+    );
   };
 
-  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${window.location.origin}/table/${table.uuid}`;
+  // معالجة التجهيز للمجموعة المختارة
+  const handleMarkPrepared = async () => {
+    setIsProcessing(true);
+    for (const itemId of selectedItems) {
+      await onToggleItem(itemId);
+    }
+    setSelectedItems([]);
+    setIsProcessing(false);
+  };
+
+  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${window.location.origin}/table/${table.uuid}`;
   const availableTables = allTables.filter(t => t.status === 'available' && t.id !== table.id);
 
   return (
-    <div className="bottom-sheet-overlay" style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'center', padding: 0, zIndex: 1000 }} onClick={(e) => e.target === e.currentTarget && onClose()}>
-      <div className="bottom-sheet" style={{ maxWidth: 800, width: '100%', borderRadius: '24px 24px 0 0', overflow: 'hidden', boxShadow: '0 -20px 40px rgba(0,0,0,0.2)', background: '#fff', display: 'flex', flexDirection: 'column', maxHeight: '90vh' }}>
+    <div className="bottom-sheet-overlay" onClick={(e) => e.target === e.currentTarget && onClose()}>
+      <div className="bottom-sheet" style={{ maxWidth: 800, width: '100%', borderRadius: '24px 24px 0 0', background: '#fff', display: 'flex', flexDirection: 'column', maxHeight: '90vh', overflow: 'hidden' }}>
         
         {/* Header */}
-        <div className="modal-header" style={{ padding: '24px 30px', borderBottom: '1px solid #f1f5f9', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#fff' }}>
-          <div className="flex items-center gap-4">
-            <div style={{ width: 48, height: 48, background: 'var(--color-primary-light)', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <span className="material-icons-round text-primary" style={{ fontSize: 28 }}>restaurant</span>
-            </div>
-            <div>
-              <h3 className="font-black text-2xl leading-none">طاولة {table.table_number}</h3>
-              <div className="text-sm text-secondary mt-2 font-bold">جلسة نشطة • {orderItems.length} أصناف</div>
-            </div>
+        <div style={{ padding: '20px 24px', borderBottom: '1px solid #f1f5f9', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div>
+            <h3 className="text-xl font-black">طاولة {table.table_number}</h3>
+            <p className="text-xs text-gray-500 font-bold">جلسة نشطة • {orderItems.length} أصناف</p>
           </div>
-          <button className="btn btn-ghost" style={{ width: 40, height: 40, padding: 0, borderRadius: '50%' }} onClick={onClose}><span className="material-icons-round">close</span></button>
+          <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-full"><span className="material-icons-round">close</span></button>
         </div>
 
-        {/* Move Session Section */}
-        {moving && (
-          <div style={{ background: '#f8fafc', padding: '20px 30px', borderBottom: '1px solid #e2e8f0' }}>
-            <div className="flex items-center gap-3">
-              <select 
-                className="form-control" 
-                style={{ flex: 1, borderRadius: '8px', height: 46, fontWeight: 'bold', fontSize: '1rem', padding: '0 16px', border: '1px solid #cbd5e1' }}
-                value={targetTableId}
-                onChange={(e) => setTargetTableId(e.target.value)}
-              >
-                <option value="">اختر الطاولة الهدف...</option>
-                {availableTables.map(t => (
-                  <option key={t.id} value={t.id}>نقل إلى طاولة #{t.table_number}</option>
-                ))}
-              </select>
+        {/* Main Content */}
+        <div style={{ flex: 1, overflowY: 'auto', padding: '24px', background: '#f8fafc' }}>
+          
+          {/* QR Code Section */}
+          <div style={{ background: '#fff', padding: '20px', borderRadius: '20px', marginBottom: '24px', textAlign: 'center', border: '1px solid #e2e8f0' }}>
+             <img src={qrUrl} style={{ width: 140, height: 140, marginBottom: 12 }} alt="QR" />
+             <div className="flex justify-center gap-2">
+                <a href={qrUrl} download={`table-${table.table_number}-qr.png`} className="btn btn-ghost btn-sm" style={{ borderRadius: 50, border: '1px solid #e2e8f0', fontSize: '11px' }}>
+                  <span className="material-icons-round" style={{ fontSize: 16 }}>download</span> تحميل الـ QR
+                </a>
+             </div>
+          </div>
+
+          {/* Bulk Action Bar */}
+          {selectedItems.length > 0 && (
+            <div style={{ background: 'var(--color-primary)', color: '#fff', padding: '16px', borderRadius: '16px', marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', boxShadow: '0 10px 20px rgba(59, 130, 246, 0.3)', animation: 'slideUp 0.3s ease' }}>
+              <span className="font-bold">تم اختيار {selectedItems.length} أصناف</span>
               <button 
-                className="btn btn-primary" 
-                style={{ borderRadius: '8px', height: 46, padding: '0 24px', fontSize: '1rem' }}
-                disabled={!targetTableId}
-                onClick={() => onMove(table.id, targetTableId)}
-              >تأكيد النقل</button>
-              <button className="btn btn-ghost" style={{ borderRadius: '8px', height: 46 }} onClick={() => setMoving(false)}>إلغاء</button>
+                onClick={handleMarkPrepared}
+                disabled={isProcessing}
+                className="bg-white text-blue-600 px-6 py-2 rounded-xl font-black text-sm"
+              >
+                {isProcessing ? 'جاري التجهيز...' : 'تجهيز المحدد الآن'}
+              </button>
+            </div>
+          )}
+
+          {/* List */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            {orderItems.map((item) => {
+              const isSelected = selectedItems.includes(item.id);
+              return (
+                <div 
+                  key={item.id} 
+                  onClick={() => !item.is_prepared && toggleSelection(item.id)}
+                  style={{ 
+                    display: 'flex', alignItems: 'center', padding: '18px', 
+                    borderRadius: '18px', border: `2px solid ${isSelected ? 'var(--color-primary)' : '#fff'}`,
+                    background: item.is_prepared ? '#f1f5f9' : '#fff',
+                    boxShadow: isSelected ? '0 8px 20px rgba(59, 130, 246, 0.1)' : '0 2px 4px rgba(0,0,0,0.02)',
+                    cursor: item.is_prepared ? 'default' : 'pointer',
+                    transition: 'all 0.2s'
+                  }}
+                >
+                  {!item.is_prepared && (
+                    <div style={{ 
+                      width: 26, height: 26, borderRadius: '8px', border: '2px solid #cbd5e1', 
+                      marginRight: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', 
+                      background: isSelected ? 'var(--color-primary)' : '#fff',
+                      borderColor: isSelected ? 'var(--color-primary)' : '#cbd5e1'
+                    }}>
+                      {isSelected && <span className="material-icons-round" style={{ color: '#fff', fontSize: 16 }}>check</span>}
+                    </div>
+                  )}
+                  
+                  <div style={{ flex: 1, textAlign: 'right', paddingRight: item.is_prepared ? 0 : 12 }}>
+                    <div className="font-black" style={{ fontSize: '1.1rem', textDecoration: item.is_prepared ? 'line-through' : 'none', color: item.is_prepared ? '#94a3b8' : '#0f172a' }}>
+                      {item.menu_item?.name}
+                    </div>
+                    <div className="text-sm font-bold text-gray-400">الكمية: {item.quantity}</div>
+                  </div>
+                  <div className="font-black" style={{ fontSize: '1.2rem' }}>₪{(item.quantity * (item.menu_item?.price || 0)).toFixed(2)}</div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Total */}
+          <div style={{ marginTop: 24, padding: 20, background: '#0f172a', borderRadius: 20, color: '#fff', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+             <span className="font-bold opacity-70">المجموع</span>
+             <span className="text-2xl font-black">₪{totalPrice.toFixed(2)}</span>
+          </div>
+        </div>
+
+        {/* Move Selection Area */}
+        {moving && (
+          <div style={{ padding: '20px', background: '#f1f5f9', borderTop: '1px solid #e2e8f0' }}>
+            <div className="flex gap-2">
+              <select className="form-control flex-1" value={targetTableId} onChange={e => setTargetTableId(e.target.value)} style={{ borderRadius: 12 }}>
+                <option value="">اختر طاولة...</option>
+                {availableTables.map(t => <option key={t.id} value={t.id}>طاولة {t.table_number}</option>)}
+              </select>
+              <button className="btn btn-primary" onClick={() => onMove(table.id, targetTableId)} disabled={!targetTableId} style={{ borderRadius: 12 }}>نقل الآن</button>
             </div>
           </div>
         )}
 
-        <div className="modal-body" style={{ overflowY: 'auto', padding: 0, flex: 1, background: '#f8fafc' }}>
-          {/* QR & Info Area */}
-          <div style={{ padding: '30px', textAlign: 'center', borderBottom: '1px solid #e2e8f0', background: '#fff', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            <div style={{ background: '#fff', padding: 16, border: '2px solid #e2e8f0', borderRadius: '16px', display: 'inline-block', marginBottom: 16, boxShadow: '0 10px 25px rgba(0,0,0,0.05)' }}>
-              <img src={qrUrl} alt="Table QR" style={{ width: 180, height: 180, display: 'block' }} />
-            </div>
-            <div className="text-sm font-black text-primary uppercase tracking-tighter mb-4">امسح الرمز لطلب الطعام</div>
-            <a href={qrUrl} download={`table-${table.table_number}-qr.png`} target="_blank" rel="noreferrer" className="btn btn-ghost btn-sm" style={{ borderRadius: '50px', border: '2px solid var(--color-primary)', color: 'var(--color-primary)', fontWeight: 800, padding: '8px 24px' }}>
-              <span className="material-icons-round">download</span>
-              تحميل الـ QR
-            </a>
-          </div>
-
-          <div style={{ padding: '30px' }}>
-            <div className="flex justify-between items-center mb-6">
-              <h4 className="font-black text-lg flex items-center gap-2 text-slate-800">
-                <span className="material-icons-round text-primary" style={{ fontSize: 24 }}>format_list_bulleted</span>
-                محتويات الطلب
-              </h4>
-              <div className="badge" style={{ background: 'var(--color-primary)', color: '#fff', fontSize: '13px', padding: '6px 14px', borderRadius: '50px' }}>
-                {orderItems.filter(i => i.is_prepared).length} من {orderItems.length} جاهز
-              </div>
-            </div>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              {orderItems.length > 0 ? (
-                orderItems.map((item) => (
-                  <label key={item.id} className={`order-item-row ${item.is_prepared ? 'is-done' : ''} ${toggling === item.id ? 'is-loading' : ''}`} style={{ cursor: 'pointer', borderRadius: '12px' }}>
-                    <div className="flex items-center gap-4 flex-1">
-                      <div className="qty-badge" style={{ borderRadius: '8px', width: 44, height: 44, fontSize: '18px' }}>{item.quantity}</div>
-                      <div>
-                        <div className="item-name" style={{ fontSize: '1.2rem' }}>{item.menu_item?.name || 'صنف غير معروف'}</div>
-                        <div className="item-price-sub" style={{ fontSize: '1rem', marginTop: 4 }}>₪{item.menu_item?.price || 0} للواحد</div>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-center gap-6">
-                      <div className="text-left">
-                        <div className="item-total-price" style={{ fontSize: '1.4rem' }}>₪{(item.quantity * (item.menu_item?.price || 0)).toFixed(2)}</div>
-                      </div>
-                      <div className="custom-checkbox" style={{ position: 'relative', width: 32, height: 32 }}>
-                        {toggling === item.id ? (
-                          <div className="spinner" style={{ width: 24, height: 24, borderTopColor: 'var(--color-primary)', margin: 4 }}></div>
-                        ) : (
-                          <>
-                            <input 
-                              type="checkbox" 
-                              checked={!!item.is_prepared} 
-                              onChange={() => handleToggle(item.id)}
-                              style={{ opacity: 0, position: 'absolute', width: '100%', height: '100%', cursor: 'pointer', zIndex: 2 }}
-                            />
-                            <div style={{ 
-                              width: '100%', height: '100%', border: `2px solid ${item.is_prepared ? 'var(--color-success)' : '#cbd5e1'}`, 
-                              borderRadius: '8px', background: item.is_prepared ? 'var(--color-success)' : '#fff',
-                              display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s'
-                            }}>
-                              {item.is_prepared && <span className="material-icons-round" style={{ color: '#fff', fontSize: 20 }}>check</span>}
-                            </div>
-                          </>
-                        )}
-                      </div>
-                    </div>
-                  </label>
-                ))
-              ) : (
-                <div className="text-center py-12" style={{ background: '#fff', borderRadius: '16px', border: '1px dashed #cbd5e1' }}>
-                  <span className="material-icons-round text-slate-200" style={{ fontSize: 64 }}>inventory_2</span>
-                  <p className="text-lg font-bold text-secondary mt-4">لا توجد طلبات نشطة</p>
-                </div>
-              )}
-            </div>
-
-            {/* Total Footer */}
-            {orderItems.length > 0 && (
-              <div className="total-box-kitchen" style={{ borderRadius: '16px' }}>
-                <div className="flex justify-between items-center">
-                  <span className="text-lg font-bold opacity-90 text-white">المجموع الإجمالي المطلوب</span>
-                  <span className="text-4xl font-black text-white">₪{totalPrice.toFixed(2)}</span>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-
-        <div className="bg-white flex gap-3" style={{ borderTop: '1px solid #e2e8f0', padding: '20px 30px' }}>
-          <button className="btn btn-ghost flex-1 kitchen-btn" style={{ color: '#ef4444', border: '2px solid #fee2e2', borderRadius: '12px', background: '#fef2f2' }} onClick={() => {
-            if (window.confirm('هل أنت متأكد من رغبتك في إغلاق هذه الطاولة وتصفير الجلسة؟')) onRelease(table.id);
-          }}>
-            <span className="material-icons-round" style={{ fontSize: 24 }}>no_meals</span>
-            إغلاق الطاولة
-          </button>
-          
-          <button className="btn btn-ghost flex-1 kitchen-btn" style={{ border: '2px solid #e2e8f0', borderRadius: '12px' }} onClick={() => setMoving(true)} disabled={moving}>
-            <span className="material-icons-round" style={{ fontSize: 24 }}>swap_horiz</span>
-            نقل الطاولة
-          </button>
-
-          <button className="btn btn-primary flex-1 kitchen-btn" style={{ borderRadius: '12px', fontSize: '1.1rem' }} onClick={() => window.print()}>
-            <span className="material-icons-round" style={{ fontSize: 24 }}>print</span>
-            طباعة الفاتورة
-          </button>
+        {/* Sticky Footer */}
+        <div style={{ padding: '20px 24px', borderTop: '1px solid #e2e8f0', background: '#fff', display: 'flex', gap: '12px' }}>
+           <button className="flex-1 py-4 bg-red-50 text-red-600 rounded-2xl font-black text-sm flex items-center justify-center gap-2" onClick={() => window.confirm('إغلاق الطاولة؟') && onRelease(table.id)}>
+              <span className="material-icons-round">no_meals</span> إغلاق
+           </button>
+           <button className="flex-1 py-4 bg-gray-100 rounded-2xl font-black text-sm flex items-center justify-center gap-2" onClick={() => setMoving(!moving)}>
+              <span className="material-icons-round">swap_horiz</span> نقل
+           </button>
+           <button className="flex-1 py-4 bg-blue-600 text-white rounded-2xl font-black text-sm flex items-center justify-center gap-2" onClick={() => window.print()}>
+              <span className="material-icons-round">print</span> طباعة الفاتورة
+           </button>
         </div>
       </div>
 
